@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Implementar un módulo de software con un envoltorio de la HAL para trabajar con la UART.
+Implementar un módulo de software con un wrapper de la HAL para trabajar con la UART.
 
 ## Punto 1
 
