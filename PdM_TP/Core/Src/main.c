@@ -71,7 +71,7 @@ void manejarEstadoRiego() {
     } else if (percentage <= 10) {
         estadoActual = ESTADO_ALERTA_CRITICA;
         tiempoGuardadoRiego = tiempoRiegoSegundos;  // Guardar el tiempo restante en caso de alerta crítica
-        LED_Bomba_Off();  // Apagar la bomba en caso de alerta crítica
+        LED_Bomba_Off();  // Se apaga la bomba de agua para prevenir daños si el nivel de agua cae por debajo del 10%.
         return;
     } else if (percentage <= 20 && percentage > 10) {
         // Estado de alerta baja, no se detiene el riego, pero se muestra el mensaje
