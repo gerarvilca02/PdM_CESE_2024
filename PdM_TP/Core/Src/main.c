@@ -167,7 +167,7 @@ void manejarEstadoPausa() {
 }
 
 void manejarEstadoAlertaCritica() {
-	LED_Bomba_Off();  // Apagar la bomba en caso de alerta crítica
+	LED_Bomba_Off();  // Se apaga la bomba de agua para prevenir daños si el nivel de agua cae por debajo del 10%.
     sprintf(message, "\033[6HAlerta: Nivel crítico de agua!\r\n");
     uartSendString((uint8_t*)message);
     LED_Alerta_On();  // Encender el LED de alerta
