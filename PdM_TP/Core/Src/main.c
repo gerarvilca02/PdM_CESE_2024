@@ -66,12 +66,12 @@ void manejarEstadoRiego() {
     if (estadoPIR == 1) {
         estadoActual = ESTADO_PAUSA;
         tiempoRestanteRiego = tiempoRiegoSegundos;  // Guardar el tiempo restante
-        LED_Bomba_Off();  // Apagar la bomba durante la pausa
+
         return;
     } else if (percentage <= 10) {
         estadoActual = ESTADO_ALERTA_CRITICA;
         tiempoGuardadoRiego = tiempoRiegoSegundos;  // Guardar el tiempo restante en caso de alerta crítica
-        LED_Bomba_Off();  // Se apaga la bomba de agua para prevenir daños si el nivel de agua cae por debajo del 10%.
+
         return;
     } else if (percentage <= 20 && percentage > 10) {
         // Estado de alerta baja, no se detiene el riego, pero se muestra el mensaje
@@ -85,22 +85,22 @@ void manejarEstadoRiego() {
     // Continuar la cuenta regresiva si no está en pausa y no hay condiciones críticas
     if (delayRead(&delayRiego)) {
         if (tiempoRiegoSegundos > 0) {
-            tiempoRiegoSegundos--;  // Decrementar el contador de tiempo de riego
+            tiempoRiegoSegundos--;
             // Actualizar la cuenta regresiva en la terminal
-            sprintf(message, "\033[5HRegando... Tiempo restante: %d segundos   ", tiempoRiegoSegundos);
+            sprintf(message, "\033[5HRegando... Tiempo restante: %d min   ", tiempoRiegoSegundos);
             uartSendString((uint8_t*)message);
 
             // Reiniciar el temporizador para el próximo segundo
             delayWrite(&delayRiego, 1000);
         } else {
             // Si el tiempo de riego ha terminado
-            LED_Bomba_Off();  // Apagar la bomba después de finalizar el riego
-            estadoActual = ESTADO_MONITOREO;  // Volver al monitoreo después del riego
+            LED_Bomba_Off();
+            estadoActual = ESTADO_MONITOREO;
         }
     }
 
     // Leer y actualizar estados de los sensores mientras se riega
-    manejarEstadoMonitoreo();  // Solo actualizar mensajes, no interferir con la lógica del riego
+    manejarEstadoMonitoreo();
 }
 
 void manejarEstadoMonitoreo() {
@@ -110,13 +110,13 @@ void manejarEstadoMonitoreo() {
     uint8_t estadoLDR = Leer_Pulsador_LDR();
 
     // Actualizar los mensajes según los valores actuales
-    sprintf(message, "\033[H\033[20C%s", estadoHumedad ? "Húmedo   " : "Seco     ");
+    sprintf(message, "\033[H\033[19C%s", estadoHumedad ? "Húmedo   " : "Seco     ");
     uartSendString((uint8_t*)message);
 
-    sprintf(message, "\033[2H\033[20C%s", estadoPIR ? "Persona detectada!" : "Sin presencia      ");
+    sprintf(message, "\033[2H\033[12C%s", estadoPIR ? "Persona detectada!" : "Sin presencia      ");
     uartSendString((uint8_t*)message);
 
-    sprintf(message, "\033[3H\033[20C%s", estadoLDR ? "Día      " : "Noche    ");
+    sprintf(message, "\033[3H\033[12C%s", estadoLDR ? "Día      " : "Noche    ");
     uartSendString((uint8_t*)message);
 
     // Leer ADC para el nivel del tanque
@@ -147,6 +147,7 @@ void manejarEstadoMonitoreo() {
 }
 
 void manejarEstadoPausa() {
+	LED_Bomba_Off();
     // Actualizar el mensaje indicando que el sistema está en pausa por detección de persona
     sprintf(message, "\033[5HPausa por detección de persona...\r\n");
     uartSendString((uint8_t*)message);
@@ -166,6 +167,7 @@ void manejarEstadoPausa() {
 }
 
 void manejarEstadoAlertaCritica() {
+	LED_Bomba_Off();  // Apagar la bomba en caso de alerta crítica
     sprintf(message, "\033[6HAlerta: Nivel crítico de agua!\r\n");
     uartSendString((uint8_t*)message);
     LED_Alerta_On();  // Encender el LED de alerta
@@ -179,7 +181,7 @@ void manejarEstadoAlertaCritica() {
         estadoActual = ESTADO_RIEGO;
         // Continuar desde el tiempo guardado
         tiempoRiegoSegundos = tiempoGuardadoRiego;
-        LED_Bomba_On();  // Encender la bomba nuevamente
+        LED_Bomba_On();
         delayWrite(&delayRiego, 1000);  // Continuar el temporizador de cuenta regresiva
     }
 }
